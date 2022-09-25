@@ -1,1 +1,4 @@
 *.grd
+*.rar
+Roms*
+__pycache__

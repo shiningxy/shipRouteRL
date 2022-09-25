@@ -18,15 +18,15 @@ class CliffWalkingWapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         self.t = None
-        self.unit = 5
+        self.unit = 20
         data = nc.Dataset("ETOPO1_Bed_c_gmt4.grd", "r+")
         # 渤海
         # z : y, x 
         # 北纬 and 东经
-        latstart = degree2index(37.25, 'N')
-        latend = degree2index(37.75, 'N')
+        latstart = degree2index(37.4, 'N')
+        latend = degree2index(37.5, 'N')
         lonstart = degree2index(121.5, 'E')
-        lonend = degree2index(123, 'E')
+        lonend = degree2index(122, 'E')
         self.lon = data.variables['x'][lonstart:lonend]
         self.lat = data.variables['y'][latstart:latend]
         self.dep = data.variables['z'][latstart:latend, lonstart:lonend]
