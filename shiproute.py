@@ -7,20 +7,35 @@ import numpy as np
 
 from gym import Env, spaces
 from gym.error import DependencyNotInstalled
+import netCDF4 as nc
+
 
 UP = 0
 RIGHT = 1
 DOWN = 2
 LEFT = 3
-
+UPRIGHT = 4
+UPLEFT = 5
+DOWNRIGHT = 6
+DOWNLEFT = 7
+def degree2index(deg:float, flag:str):
+    if flag == 'N':
+        index = deg * 60 + 90 * 60
+    if flag == 'S':
+        index = 90 * 60 - deg * 60
+    if flag == 'E':
+        index = deg * 60 + 180 * 60
+    if flag == 'W':
+        index = 180 * 60 - deg * 60
+    return int(index)
 
 def categorical_sample(prob_n, np_random: np.random.Generator):
     """Sample from categorical distribution where each row specifies class probabilities."""
     prob_n = np.asarray(prob_n)
     csprob_n = np.cumsum(prob_n)
     return np.argmax(csprob_n > np_random.random())
-    
-class CliffWalkingEnv(Env):
+
+class shipRouteEnv(Env):
     """
     This is a simple implementation of the Gridworld Cliff
     reinforcement learning task.
@@ -63,15 +78,39 @@ class CliffWalkingEnv(Env):
     }
 
     def __init__(self, render_mode: Optional[str] = None):
-        self.shape = (4, 12)
-        self.start_state_index = np.ravel_multi_index((3, 0), self.shape)
 
+        latstart = 37.4
+        latend = 37.5
+        lonstart = 121.7
+        lonend = 121.9
+        self.xStartIndex = 0
+        self.yStartIndex = 0
+        self.xEndIndex = 3
+        self.yEndIndex = 4
+        latstartIndex = degree2index(latstart, 'N')
+        latendIndex = degree2index(latend, 'N')
+        lonstartIndex = degree2index(lonstart, 'E')
+        lonendIndex = degree2index(lonend, 'E')
+        self.shape = (int((latend - latstart) * 60), int((lonend - lonstart) * 60))
+        self.start_state_index = np.ravel_multi_index((self.xStartIndex, self.yStartIndex), self.shape)
         self.nS = np.prod(self.shape)
         self.nA = 4
 
         # Cliff Location
         self._cliff = np.zeros(self.shape, dtype=bool)
-        self._cliff[3, 1:-1] = True
+
+        data = nc.Dataset("ETOPO1_Bed_c_gmt4.grd", "r+")
+
+        shipDraught = 0
+        self.lon = data.variables['x'][lonstartIndex:lonendIndex]
+        self.lat = data.variables['y'][latstartIndex:latendIndex]
+        self.dep = data.variables['z'][latstartIndex:latendIndex, lonstartIndex:lonendIndex]
+        self.max_x = len(self.lon)
+        self.max_y = len(self.lat)
+        for i, lon in enumerate(self.lon):
+            for j, lat in enumerate(self.lat):
+                if self.dep[j, i] > -shipDraught:
+                    self._cliff[self.max_y - j - 1,i] = True
 
         # Calculate transition probabilities and rewards
         self.P = {}
@@ -82,9 +121,13 @@ class CliffWalkingEnv(Env):
             self.P[s][RIGHT] = self._calculate_transition_prob(position, [0, 1])
             self.P[s][DOWN] = self._calculate_transition_prob(position, [1, 0])
             self.P[s][LEFT] = self._calculate_transition_prob(position, [0, -1])
-
+            # 计划将动作空间由4个扩展为8个
+            # self.P[s][UPRIGHT] = self._calculate_transition_prob(position, [-1, 1])
+            # self.P[s][UPLEFT] = self._calculate_transition_prob(position, [-1, -1])
+            # self.P[s][DOWNRIGHT] = self._calculate_transition_prob(position, [1, 1])
+            # self.P[s][DOWNLEFT] = self._calculate_transition_prob(position, [1, -1])
+            
         # Calculate initial state distribution
-        # We always start in state (3, 0)
         self.initial_state_distrib = np.zeros(self.nS)
         self.initial_state_distrib[self.start_state_index] = 1.0
 
@@ -131,7 +174,7 @@ class CliffWalkingEnv(Env):
         if self._cliff[tuple(new_position)]:
             return [(1.0, self.start_state_index, -100, False)]
 
-        terminal_state = (self.shape[0] - 1, self.shape[1] - 1)
+        terminal_state = (self.yEndIndex, self.xEndIndex)
         is_terminated = tuple(new_position) == terminal_state
         return [(1.0, new_state, -1, is_terminated)]
 
@@ -278,3 +321,6 @@ class CliffWalkingEnv(Env):
 
         with closing(outfile):
             return outfile.getvalue()
+
+if __name__ == "__main__":
+    shipRouteEnv(Env)

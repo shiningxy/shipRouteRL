@@ -40,12 +40,12 @@ for i, lat in enumerate(DEP):
 
 # 画图展示 手动选择起止点坐标
 # 例 在此图中选择起始点坐标x=310 y=330 终点坐标x=210 y=50
-# 换算为经纬度时除以六十
-# 则 新的起始点经纬度应为 shipLatStart = 330/60 + 35 shipLonStart = 310/60 + 117
-# 则 新的终点经纬度应为 shipLatEnd = 50/60 + 35 shipLonEnd = 210/60 + 117
-# 则 新的起始点坐标应为 shipLatStartIndex = 330 + 35 * 60 shipLonStartIndex = 310 + 117 * 60
-# 则 新的终点坐标应为 shipLatEndIndex = 50 + 35 * 60 shipLonEnd = 210 + 117 * 60
-# 将这个坐标传参到
+# self.xStartIndex = 310
+# self.yStartIndex = 330
+# self.xEndIndex = 210
+# self.yEndIndex = 50
+
+# 将这个坐标复制到gridworld.py和shiproute.py 作为__init__中的初始化参数
 ax = plt.subplot()
 im = ax.imshow(newDep, cmap='Greys', origin='lower')
 plt.show()

@@ -2,6 +2,8 @@ import gym
 import turtle
 import numpy as np
 import netCDF4 as nc
+from typing import Optional
+from shiproute import shipRouteEnv
 
 def degree2index(deg:float, flag:str):
     if flag == 'N':
@@ -14,22 +16,28 @@ def degree2index(deg:float, flag:str):
         index = 180 * 60 - deg * 60
     return int(index)
 
-class CliffWalkingWapper(gym.Wrapper):
+class shipRouteWapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         self.t = None
-        self.unit = 20
+        # unit 为 每个格子的大小 可以单独运行gridworld.py 观察窗口大小 调整self.unit的值
+        self.unit = 60
         data = nc.Dataset("ETOPO1_Bed_c_gmt4.grd", "r+")
-        # 渤海
-        # z : y, x 
-        # 北纬 and 东经
-        latstart = degree2index(37.4, 'N')
-        latend = degree2index(37.5, 'N')
-        lonstart = degree2index(121.5, 'E')
-        lonend = degree2index(122, 'E')
-        self.lon = data.variables['x'][lonstart:lonend]
-        self.lat = data.variables['y'][latstart:latend]
-        self.dep = data.variables['z'][latstart:latend, lonstart:lonend]
+        latstart = 37.4
+        latend = 37.5
+        lonstart = 121.7
+        lonend = 121.9
+        self.xStartIndex = 0
+        self.yStartIndex = 0
+        self.xEndIndex = 3
+        self.yEndIndex = 4
+        latstartIndex = degree2index(latstart, 'N')
+        latendIndex = degree2index(latend, 'N')
+        lonstartIndex = degree2index(lonstart, 'E')
+        lonendIndex = degree2index(lonend, 'E')
+        self.lon = data.variables['x'][lonstartIndex:lonendIndex]
+        self.lat = data.variables['y'][latstartIndex:latendIndex]
+        self.dep = data.variables['z'][latstartIndex:latendIndex, lonstartIndex:lonendIndex]
         self.max_x = len(self.lon)
         self.max_y = len(self.lat)
 
@@ -98,20 +106,23 @@ class CliffWalkingWapper(gym.Wrapper):
                 for j, lat in enumerate(self.lat):
                     if self.dep[j, i] > 0:
                         self.draw_box(i, j, 'black')
-            # self.draw_box(self.max_x - 1, 0, 'yellow')
+            self.draw_box(self.xEndIndex, self.max_y - 1 - self.yEndIndex, 'yellow')
             self.t.shape('turtle')
 
         x_pos = self.s % self.max_x
         y_pos = self.max_y - 1 - int(self.s / self.max_x)
         self.move_player(x_pos, y_pos)
+    def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
+        super().reset(seed=seed)
 
 if __name__ == "__main__":
-    env = gym.make("CliffWalking-v0")  # 0 up, 1 right, 2 down, 3 left
-    env = CliffWalkingWapper(env)
+    env = shipRouteEnv()  # 0 up, 1 right, 2 down, 3 left
+    env = shipRouteWapper(env)
     env.reset()
-    for step in range(10):
+    for step in range(50):
         action = np.random.randint(0, 4)
-        obs, reward, done, info = env.step(action)
+        # print(env.step(action))
+        obs, reward, done, _, info = env.step(action)
         print('step {}: action {}, obs {}, reward {}, done {}, info {}'.format(\
                 step, action, obs, reward, done, info))
         env.render()
