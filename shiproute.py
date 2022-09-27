@@ -148,7 +148,7 @@ class shipRouteEnv(Env):
         self.render_mode = render_mode
 
         # pygame utils
-        self.cell_size = (60, 60)
+        self.cell_size = (100, 100)
         self.window_size = (
             self.shape[1] * self.cell_size[1],
             self.shape[0] * self.cell_size[0],

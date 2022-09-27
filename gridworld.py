@@ -4,6 +4,8 @@ import numpy as np
 import netCDF4 as nc
 from typing import Optional
 from shiproute import shipRouteEnv
+from PIL import Image
+import matplotlib.animation as animation
 
 def degree2index(deg:float, flag:str):
     if flag == 'N':
@@ -21,7 +23,7 @@ class shipRouteWapper(gym.Wrapper):
         gym.Wrapper.__init__(self, env)
         self.t = None
         # unit 为 每个格子的大小 可以单独运行gridworld.py 观察窗口大小 调整self.unit的值
-        self.unit = 10
+        self.unit = 20
         # 读取全球高程网格nc数据
         data = nc.Dataset("ETOPO1_Bed_c_gmt4.grd", "r+")
         # 初始化真实世界中的经纬度 之后的代码会自动将这个经纬度转换为nc数据中的索引
@@ -35,7 +37,7 @@ class shipRouteWapper(gym.Wrapper):
         self.xEndIndex = 3
         self.yEndIndex = 2
         # 船舶吃水要求
-        self.shipDraught = 5
+        self.shipDraught = 0
         # 转换为nc数据中的索引
         latstartIndex = degree2index(latstart, 'N')
         latendIndex = degree2index(latend, 'N')
@@ -93,8 +95,10 @@ class shipRouteWapper(gym.Wrapper):
     # 渲染网格，渲染智能体采取动作的过程
     def render(self):
         if self.t == None:
+
             self.t = turtle.Turtle()
             self.wn = turtle.Screen()
+
             self.wn.setup(self.unit * self.max_x + 100,
                           self.unit * self.max_y + 100)
             self.wn.setworldcoordinates(0, 0, self.unit * self.max_x,
@@ -126,18 +130,22 @@ class shipRouteWapper(gym.Wrapper):
             # 绘制终点的黄色框
             self.draw_box(self.xEndIndex, self.max_y - 1 - self.yEndIndex, 'yellow')
             self.t.shape('turtle')
+
         # x_pos y_pos 的表达式不要修改 self.s表示从动作空间中随机取的某一个动作
         x_pos = self.s % self.max_x
         y_pos = self.max_y - 1 - int(self.s / self.max_x)
         self.move_player(x_pos, y_pos)
+
     def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
         super().reset(seed=seed)
+
 
 if __name__ == "__main__":
     env = shipRouteEnv()  # 0 up, 1 right, 2 down, 3 left
     env = shipRouteWapper(env)
     env.reset()
-    for step in range(50):
+    epochs = 100
+    for step in range(epochs):
         action = np.random.randint(0, 4)
         # print(env.step(action))
         obs, reward, done, _, info = env.step(action)
