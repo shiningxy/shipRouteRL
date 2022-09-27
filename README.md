@@ -1,5 +1,7 @@
 # shipRouteRL
 
+
+
 ## Download
 
 下载[ETOPO1_Bed_c_gmt4.grd.gz](https://ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/bedrock/cell_registered/netcdf/ETOPO1_Bed_c_gmt4.grd.gz)，存放至根目录
@@ -57,3 +59,7 @@ self.shipDraught = 5
 [utils.py](https://github.com/shiningxy/shipRouteRL/blob/main/utils.py) -> 定义存储训练结果函数，定义绘图函数
 
 [VisualDL可视化分析工具使用介绍.ipynb](https://github.com/shiningxy/shipRouteRL/blob/main/VisualDL%E5%8F%AF%E8%A7%86%E5%8C%96%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D.ipynb) -> [VisualDL](https://github.com/PaddlePaddle/VisualDL/blob/develop/README_CN.md)的训练过程展示工具包说明，类似[tensorboard](https://tensorflow.google.cn/tensorboard?hl=zh-cn)，效果更美观
+
+## Result
+
+![结果动画展示](img/fig3.gif)
