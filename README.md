@@ -6,6 +6,8 @@
 
 ## Install
 ```
+conda create -n shiprl python=3.7
+conda activate shiprl
 pip install parl -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install visualdl -i https://mirror.baidu.com/pypi/simple
 pip install gym==0.26.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
@@ -13,6 +15,7 @@ pip install numpy -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install netCDF4 -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install pygame -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install pandas -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install seaborn -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## TODO

@@ -15,12 +15,10 @@
 # -*- coding: utf-8 -*-
 
 import time
-import gym
 from gridworld import shipRouteWapper
 from agent import QLearningAgent
 from parl.utils import summary
 from shiproute import shipRouteEnv
-import os
 from utils import save_results, plot_rewards, smooth
 import warnings
 warnings.filterwarnings("ignore")
@@ -110,12 +108,12 @@ def main():
             is_render = False
     res_dic = {'step':steps, 'rewards':rewards}
     save_results(res_dic, tag='train', path="results")
-    # plot_rewards(res_dic['rewards'],  path = "results", tag = "train", save_fig=True, show_fig=True)
+    plot_rewards(res_dic['rewards'],  path = "results", tag = "train", save_fig=True, show_fig=True)
     # 训练结束，查看算法效果
     rewards, steps = test(env, agent)
     res_dic = {'step':steps, 'rewards':rewards}
     save_results(res_dic, tag='test', path="results")
-    # plot_rewards(res_dic['rewards'],  path = "results", tag = "test", save_fig=True, show_fig=True)
+    plot_rewards(res_dic['rewards'],  path = "results", tag = "test", save_fig=True, show_fig=True)
 
     # 保存Q表格（策略）
     agent.save()
