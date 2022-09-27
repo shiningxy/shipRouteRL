@@ -1,6 +1,12 @@
 # shipRouteRL
 
+## Note
 
+* 已实现自定义海区
+* 已实现自定义起止点功能。
+* 支持VisualDL可视化分析工具
+* 支持自动保存训练历史奖励、时间成本和绘图结果
+* 支持QLearning算法，未来会补充DQN算法。
 
 ## Download
 
