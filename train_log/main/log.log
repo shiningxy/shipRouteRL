@@ -1,2 +1,2 @@
-[33m[09-27 15:55:31 MainThread @visualdl.py:34][0m [5m[33mWRN[0m [VisualDL] logdir is None, will save VisualDL files to train_log\main
+[33m[09-27 17:10:14 MainThread @visualdl.py:34][0m [5m[33mWRN[0m [VisualDL] logdir is None, will save VisualDL files to train_log\main
 View the data using: visualdl --logdir=train_log\main --host=10.17.7.80

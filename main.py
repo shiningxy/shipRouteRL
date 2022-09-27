@@ -58,7 +58,7 @@ def test(env, agent):
         next_obs, reward, done, _, info = env.step(action)
         total_reward += reward
         obs = next_obs
-        time.sleep(0.2)
+        # time.sleep(0.2)
         env.render()  # 进行一次渲染
         if done:
             print('test reward = %.1f' % (total_reward))
@@ -84,8 +84,8 @@ def main():
         gamma=0.9,
         e_greed=0.1)
 
-    # 读取Q表格（策略）
-    agent.restore(npy_file='./q_table.npy')
+    # 读取Q表格（策略） 第一次训练生成策略，之后的训练可以读取策略以加快收敛速度
+    # agent.restore(npy_file='./q_table.npy')
 
     is_render = False
     rewards = []  # record rewards for all episodes
@@ -104,22 +104,26 @@ def main():
                            episode)
         t2 = time.time()
         times.append(round(t2-t1,3))
-        # 只渲染最后一次的结果
-        if episode == epochs - 1:
+        # 训练过程不渲染，只在测试阶段渲染一次
+        if episode % 50 == 0:
             is_render = False
         else:
             is_render = False
+    # 保存训练结果并画图
     res_dic = {'step':steps, 'rewards':rewards, 'times':times}
     save_results(res_dic, tag='train', path="results")
     plot_rewards(res_dic['rewards'],  path = "results", tag = "train", save_fig=True, show_fig=True)
     # 训练结束，查看算法效果
+    # 训练过程不渲染，只在测试阶段渲染一次
     rewards, steps = test(env, agent)
+    # 保存测试结果并画图
     res_dic = {'step':steps, 'rewards':rewards}
     save_results(res_dic, tag='test', path="results")
     plot_rewards(res_dic['rewards'],  path = "results", tag = "test", save_fig=True, show_fig=True)
 
     # 保存Q表格（策略）
     agent.save()
+    # 参考VisualDL可视化分析工具使用介绍.ipynb
     # os.system("visualdl --logdir='train_log/main' --host=192.168.1.2")
 
 if __name__ == "__main__":

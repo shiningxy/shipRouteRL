@@ -78,23 +78,32 @@ class shipRouteEnv(Env):
     }
 
     def __init__(self, render_mode: Optional[str] = None):
-
+        # 初始化真实世界中的经纬度 之后的代码会自动将这个经纬度转换为nc数据中的索引
         latstart = 37
         latend = 37.5
         lonstart = 122.5
         lonend = 123
+        # 通过init_position.py鼠标手动调整，找到的起止点x y索引坐标
         self.xStartIndex = 2
         self.yStartIndex = 23
         self.xEndIndex = 3
         self.yEndIndex = 2
+        # 船舶吃水要求
         self.shipDraught = 5
+        # 转换为nc数据中的索引
         latstartIndex = degree2index(latstart, 'N')
         latendIndex = degree2index(latend, 'N')
         lonstartIndex = degree2index(lonstart, 'E')
         lonendIndex = degree2index(lonend, 'E')
+        # 计算得到网格形状 1° = 60' nc数据的精度为1' 所以要乘以60
         self.shape = (int((latend - latstart) * 60), int((lonend - lonstart) * 60))
+        # np.ravel_multi_index 当第一个参数和第二个参数的shape一致时，起到的作用是，得到(self.yStartIndex, self.xStartIndex)在self.shape这个网格中，从左上角开始按行逐个计数，返回(self.yStartIndex, self.xStartIndex)在新的一维数组中的索引
+        # 或者说 np.ravel_multi_index 将self.shape这个网格按行首尾拼接为一维数组，返回原位置为(self.yStartIndex, self.xStartIndex)的数，在新的一维数组中的索引
+        # np.ravel_multi_index((self.yStartIndex, self.xStartIndex), self.shape) 等价于 self.yStartIndex * self.shape[0] + self.xStartIndex
         self.start_state_index = np.ravel_multi_index((self.yStartIndex, self.xStartIndex), self.shape)
+        # 观察空间
         self.nS = np.prod(self.shape)
+        # 动作空间
         self.nA = 4
 
         # Cliff Location
@@ -139,7 +148,7 @@ class shipRouteEnv(Env):
         self.render_mode = render_mode
 
         # pygame utils
-        self.cell_size = (100, 100)
+        self.cell_size = (60, 60)
         self.window_size = (
             self.shape[1] * self.cell_size[1],
             self.shape[0] * self.cell_size[0],

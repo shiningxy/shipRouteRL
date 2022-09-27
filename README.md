@@ -25,17 +25,23 @@ pip install seaborn -i https://pypi.tuna.tsinghua.edu.cn/simple
 先确定网格范围，再将鼠标放在python Figure图中，获取起止点索引坐标
 
 ```
+# 初始化真实世界中的经纬度 之后的代码会自动将这个经纬度转换为nc数据中的索引
 latstart = 37
 latend = 37.5
 lonstart = 122.5
 lonend = 123
+# 通过init_position.py鼠标手动调整，找到的起止点x y索引坐标
 self.xStartIndex = 2
 self.yStartIndex = 23
 self.xEndIndex = 3
 self.yEndIndex = 2
+# 船舶吃水要求
 self.shipDraught = 5
 ```
-![获取起止点索引坐标图示](img/fig1.png)
+!<img src="img/fig1.png" width=320 height=320>
+!<img src="img/fig2.png" width=320 height=320>
+
+
 ## Structure
 
 [main.py](https://github.com/shiningxy/shipRouteRL/blob/main/main.py) -> 主程序入口，完成训练和测试，保存训练结果，绘制结果图
