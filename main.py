@@ -43,7 +43,7 @@ def test(env, agent):
         next_obs, reward, done, _, info = env.step(action)
         total_reward += reward
         obs = next_obs
-        # time.sleep(0.2)
+        time.sleep(0.5)
         env.render()  # 进行一次渲染
         if done:
             print('test reward = %.1f' % (total_reward))

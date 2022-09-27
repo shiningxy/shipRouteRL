@@ -37,7 +37,7 @@ class shipRouteWapper(gym.Wrapper):
         self.xEndIndex = 3
         self.yEndIndex = 2
         # 船舶吃水要求
-        self.shipDraught = 0
+        self.shipDraught = 5
         # 转换为nc数据中的索引
         latstartIndex = degree2index(latstart, 'N')
         latendIndex = degree2index(latend, 'N')
