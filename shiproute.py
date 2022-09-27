@@ -79,20 +79,21 @@ class shipRouteEnv(Env):
 
     def __init__(self, render_mode: Optional[str] = None):
 
-        latstart = 37.4
+        latstart = 37
         latend = 37.5
-        lonstart = 121.7
-        lonend = 121.9
-        self.xStartIndex = 0
-        self.yStartIndex = 0
+        lonstart = 122.5
+        lonend = 123
+        self.xStartIndex = 2
+        self.yStartIndex = 23
         self.xEndIndex = 3
-        self.yEndIndex = 4
+        self.yEndIndex = 2
+        self.shipDraught = 5
         latstartIndex = degree2index(latstart, 'N')
         latendIndex = degree2index(latend, 'N')
         lonstartIndex = degree2index(lonstart, 'E')
         lonendIndex = degree2index(lonend, 'E')
         self.shape = (int((latend - latstart) * 60), int((lonend - lonstart) * 60))
-        self.start_state_index = np.ravel_multi_index((self.xStartIndex, self.yStartIndex), self.shape)
+        self.start_state_index = np.ravel_multi_index((self.yStartIndex, self.xStartIndex), self.shape)
         self.nS = np.prod(self.shape)
         self.nA = 4
 
@@ -101,7 +102,7 @@ class shipRouteEnv(Env):
 
         data = nc.Dataset("ETOPO1_Bed_c_gmt4.grd", "r+")
 
-        shipDraught = 0
+
         self.lon = data.variables['x'][lonstartIndex:lonendIndex]
         self.lat = data.variables['y'][latstartIndex:latendIndex]
         self.dep = data.variables['z'][latstartIndex:latendIndex, lonstartIndex:lonendIndex]
@@ -109,7 +110,7 @@ class shipRouteEnv(Env):
         self.max_y = len(self.lat)
         for i, lon in enumerate(self.lon):
             for j, lat in enumerate(self.lat):
-                if self.dep[j, i] > -shipDraught:
+                if self.dep[j, i] > -self.shipDraught:
                     self._cliff[self.max_y - j - 1,i] = True
 
         # Calculate transition probabilities and rewards
@@ -129,6 +130,7 @@ class shipRouteEnv(Env):
             
         # Calculate initial state distribution
         self.initial_state_distrib = np.zeros(self.nS)
+
         self.initial_state_distrib[self.start_state_index] = 1.0
 
         self.observation_space = spaces.Discrete(self.nS)
@@ -137,7 +139,7 @@ class shipRouteEnv(Env):
         self.render_mode = render_mode
 
         # pygame utils
-        self.cell_size = (60, 60)
+        self.cell_size = (100, 100)
         self.window_size = (
             self.shape[1] * self.cell_size[1],
             self.shape[0] * self.cell_size[0],

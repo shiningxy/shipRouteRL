@@ -58,7 +58,7 @@ def test(env, agent):
         next_obs, reward, done, _, info = env.step(action)
         total_reward += reward
         obs = next_obs
-        time.sleep(0.5)
+        time.sleep(0.2)
         env.render()  # 进行一次渲染
         if done:
             print('test reward = %.1f' % (total_reward))
@@ -72,7 +72,6 @@ def test(env, agent):
 
 
 def main():
-
     # 创建环境
     env = shipRouteEnv()  # 0 up, 1 right, 2 down, 3 left
     env = shipRouteWapper(env)
@@ -86,12 +85,15 @@ def main():
         e_greed=0.1)
 
     # 读取Q表格（策略）
-    # agent.restore(npy_file='./q_table.npy')
+    agent.restore(npy_file='./q_table.npy')
 
     is_render = False
     rewards = []  # record rewards for all episodes
     steps = []
-    for episode in range(500):
+    times = []
+    epochs = 1000
+    for episode in range(epochs):
+        t1 = time.time()
         ep_reward, ep_steps = train(env, agent, is_render)
         print('Episode %s: steps = %s , reward = %.1f' % (episode, ep_steps,
                                                           ep_reward))
@@ -100,13 +102,14 @@ def main():
         # 保存训练过程中，每个回合的累计回报（奖励）
         summary.add_scalar('q_learning/episode rewards', ep_reward,
                            episode)
-
-        # 每隔50个episode渲染一次看看效果
-        if episode % 50 == 0:
-            is_render = True
+        t2 = time.time()
+        times.append(round(t2-t1,3))
+        # 只渲染最后一次的结果
+        if episode == epochs - 1:
+            is_render = False
         else:
             is_render = False
-    res_dic = {'step':steps, 'rewards':rewards}
+    res_dic = {'step':steps, 'rewards':rewards, 'times':times}
     save_results(res_dic, tag='train', path="results")
     plot_rewards(res_dic['rewards'],  path = "results", tag = "train", save_fig=True, show_fig=True)
     # 训练结束，查看算法效果

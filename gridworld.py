@@ -21,16 +21,17 @@ class shipRouteWapper(gym.Wrapper):
         gym.Wrapper.__init__(self, env)
         self.t = None
         # unit 为 每个格子的大小 可以单独运行gridworld.py 观察窗口大小 调整self.unit的值
-        self.unit = 60
+        self.unit = 10
         data = nc.Dataset("ETOPO1_Bed_c_gmt4.grd", "r+")
-        latstart = 37.4
+        latstart = 37
         latend = 37.5
-        lonstart = 121.7
-        lonend = 121.9
-        self.xStartIndex = 0
-        self.yStartIndex = 0
+        lonstart = 122.5
+        lonend = 123
+        self.xStartIndex = 2
+        self.yStartIndex = 23
         self.xEndIndex = 3
-        self.yEndIndex = 4
+        self.yEndIndex = 2
+        self.shipDraught = 5
         latstartIndex = degree2index(latstart, 'N')
         latendIndex = degree2index(latend, 'N')
         lonstartIndex = degree2index(lonstart, 'E')
@@ -67,7 +68,7 @@ class shipRouteWapper(gym.Wrapper):
         self.t.setheading(90)
         self.t.down()
         self.t.begin_fill()
-        for i in range(4):
+        for i in range(3):
             self.t.forward(self.unit)
             self.t.right(90)
         self.t.end_fill()
@@ -104,7 +105,7 @@ class shipRouteWapper(gym.Wrapper):
 
             for i, lon in enumerate(self.lon):
                 for j, lat in enumerate(self.lat):
-                    if self.dep[j, i] > 0:
+                    if self.dep[j, i] > -self.shipDraught:
                         self.draw_box(i, j, 'black')
             self.draw_box(self.xEndIndex, self.max_y - 1 - self.yEndIndex, 'yellow')
             self.t.shape('turtle')

@@ -20,19 +20,20 @@ pip install seaborn -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ## TODO
 
-gridworld.py & shiproute.py中的这八个参数，需要预先使用init_position.py进行选择并计算确定，之后手动修改
+gridworld.py & shiproute.py中的这九个参数，需要预先使用init_position.py进行选择并计算确定，之后手动修改
 
 先确定网格范围，再选取起止点索引坐标
 
 ```
-latstart = 37.4
+latstart = 37
 latend = 37.5
-lonstart = 121.7
-lonend = 121.9
+lonstart = 122.5
+lonend = 123
 self.xStartIndex = 0
-self.yStartIndex = 0
-self.xEndIndex = 3
+self.yStartIndex = 21
+self.xEndIndex = 9
 self.yEndIndex = 4
+self.shipDraught = 5
 ```
 
 ## Structure
